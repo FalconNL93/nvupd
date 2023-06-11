@@ -7,12 +7,12 @@ namespace NvUpd.UI.Views;
 /// </summary>
 public partial class MainWindow
 {
-    public MainWindow()
+    public MainWindow(MainWindowViewModel viewModel)
     {
-        DataContext = ViewModel;
+        ViewModel = viewModel;
 
         InitializeComponent();
     }
 
-    public MainWindowViewModel ViewModel { get; } = new();
+    public MainWindowViewModel ViewModel { get; set; }
 }

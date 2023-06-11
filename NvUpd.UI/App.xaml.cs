@@ -39,20 +39,11 @@ public partial class App
 
         await AppHost.StartAsync();
         var startupForm = AppHost.Services.GetRequiredService<MainWindow>();
-        var gpuService = AppHost.Services.GetRequiredService<GpuService>();
-
+        var startupFormViewModel = AppHost.Services.GetRequiredService<MainWindowViewModel>();
+        
         startupForm.Show();
-        startupForm.ViewModel.GpuInformation = gpuService.GetGpuInformation();
-        
-        startupForm.ViewModel.UpdateStatus = "Searching for updates...";
-        var driverInfo = await gpuService.GetLatestUpdates();
-        startupForm.ViewModel.NvidiaUpdate.UpdateAvailable = driverInfo.UpdateAvailable;
-        startupForm.ViewModel.NvidiaUpdate.LatestVersion = driverInfo.LatestVersion;
-        startupForm.ViewModel.UpdateStatus = "Done";
+        await startupForm.ViewModel.Check();
 
-        await Task.Delay(5000);
-        startupForm.ViewModel.NvidiaUpdate.UpdateAvailable = true;
-        
         base.OnStartup(e);
     }
 

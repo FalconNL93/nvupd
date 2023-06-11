@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Win32;
+using Nvupd.Core.Exceptions;
 using Nvupd.Core.Models;
 
 namespace Nvupd.Core.Helpers;
@@ -42,7 +43,7 @@ public static class GpuHelper
         }
         catch (Exception e)
         {
-            throw new Exception($"Could not parse OS information with OS-Data: {e.Message}");
+            throw new UnknownOsException();
         }
 
         try
@@ -62,7 +63,7 @@ public static class GpuHelper
         }
         catch (Exception e)
         {
-            throw new Exception("Could not parse GPU information with GPU-Data");
+            throw new UnknownGpuException();
         }
 
         return gpuInformation;
