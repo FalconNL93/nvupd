@@ -6,7 +6,23 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
     <Grid>
-        <StackPanel />
+        <StackPanel>
+            <TextBlock Text="GPU Information:" />
+            <Separator />
+            <TextBlock Text="{Binding ViewModel.GpuInformation.Name}" />
+            <TextBlock Text="{Binding ViewModel.GpuInformation.NiceDriverVersion}" />
+            <Separator />
+            <TextBlock Text="{Binding ViewModel.UpdateStatus}" />
+            <TextBlock Text="{Binding ViewModel.NvidiaUpdate.LatestVersion}" />
+            <Button
+                Visibility="{Binding ViewModel.NvidiaUpdate.UpdateAvailable,  
+                Converter={StaticResource BooleanToVisibilityConverter}}"
+                Height="50"
+                Content="Update" />
+        </StackPanel>
     </Grid>
 </Window>

@@ -14,5 +14,5 @@ public partial class MainWindow
         InitializeComponent();
     }
 
-    public MainWindowViewModel ViewModel { get; set; } = new();
+    public MainWindowViewModel ViewModel { get; } = new();
 }

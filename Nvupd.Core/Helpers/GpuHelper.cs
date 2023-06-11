@@ -22,6 +22,7 @@ public static class GpuHelper
 
             gpuInformation.Name = (string)obj["Name"];
             gpuInformation.DriverVersion = (string)obj["DriverVersion"];
+            gpuInformation.NiceDriverVersion = ToNiceVersion(gpuInformation.DriverVersion);
         }
 
         var nvidiaRegistry = Registry.LocalMachine.OpenSubKey(NvidiaRegistryKey, false);
@@ -65,5 +66,10 @@ public static class GpuHelper
         }
 
         return gpuInformation;
+    }
+
+    private static string ToNiceVersion(string driverVersion)
+    {
+        return driverVersion.Remove(0, 6).Replace(".", "").Insert(3, ".");
     }
 }
