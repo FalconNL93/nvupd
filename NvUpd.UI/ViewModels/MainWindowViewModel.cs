@@ -19,6 +19,9 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     [ObservableProperty]
     private string _updateStatus;
+    
+    [ObservableProperty]
+    private bool _isBusy;
 
     public MainWindowViewModel(GpuService gpuService)
     {
@@ -27,21 +30,22 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     public async Task Check()
     {
-        UpdateStatus = "Searching for updates...";
-        
+        IsBusy = true;
+
         try
         {
-           GpuInformation = _gpuService.GetGpuInformation();
+            GpuInformation = _gpuService.GetGpuInformation();
+            var driverInfo = await _gpuService.GetLatestUpdates();
+            NvidiaUpdate.UpdateAvailable = driverInfo.UpdateAvailable;
+            NvidiaUpdate.LatestVersion = driverInfo.LatestVersion;
         }
         catch (Exception)
         {
             UpdateStatus = "Unable to determine your GPU";
-            return;
         }
-        
-        var driverInfo = await _gpuService.GetLatestUpdates();
-        NvidiaUpdate.UpdateAvailable = driverInfo.UpdateAvailable;
-        NvidiaUpdate.LatestVersion = driverInfo.LatestVersion;
-        UpdateStatus = "Done";
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }

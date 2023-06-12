@@ -3,13 +3,13 @@ using Nvupd.Core.Models;
 
 namespace Nvupd.Core.Services;
 
-public class NvidiaUpdateService
+public static class NvidiaUpdateService
 {
     private const string Url = "https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php";
 
     private static readonly HttpClient Client = new() { BaseAddress = new Uri($"{Url}") };
 
-    public static async Task<NvidiaResponse> FetchNvidiaInfo(int pfId, int osId, bool dch)
+    private static async Task<NvidiaResponse> FetchNvidiaInfo(int pfId, int osId, bool dch)
     {
         var dchQuery = dch ? 1 : 0;
         var httpResponse = await Client.GetAsync($"?func=DriverManualLookup&pfid={pfId}&osID={osId}&dch={dchQuery}");
@@ -38,5 +38,10 @@ public class NvidiaUpdateService
         }
 
         return downloadInfo.downloadInfo;
+    }
+
+    public static bool IsLatest(GpuInformation gpuInformation, DownloadInfo downloadInfo)
+    {
+        return gpuInformation.NiceDriverVersion == downloadInfo.Version;
     }
 }

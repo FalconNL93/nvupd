@@ -8,7 +8,6 @@ namespace NvUpd.UI.Services;
 
 public class GpuService
 {
-
     public GpuService()
     {
     }
@@ -25,7 +24,7 @@ public class GpuService
 
         return new NvidiaUpdate
         {
-            UpdateAvailable = true,
+            UpdateAvailable = !NvidiaUpdateService.IsLatest(gpuInformation, downloadInfo),
             LatestVersion = downloadInfo.Version
         };
     }

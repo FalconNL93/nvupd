@@ -11,7 +11,7 @@ internal class Program
         {
             var gpu = GpuHelper.GetGpuInformation();
             Console.WriteLine($"Device: {gpu.Name}");
-            Console.WriteLine($"Installed Drivers: {gpu.DriverVersion}");
+            Console.WriteLine($"Installed Drivers: {gpu.NiceDriverVersion}");
             Console.WriteLine($"OS ID: {gpu.OsId}");
             Console.WriteLine($"GPU ID: {gpu.PfId}");
             Console.WriteLine($"DCH Driver: {gpu.IsDch}");
