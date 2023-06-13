@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Nvupd.Core.Models;
 using NvUpd.UI.Models;
 using NvUpd.UI.Services;
@@ -13,39 +15,64 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     [ObservableProperty]
     private GpuInformation _gpuInformation = new();
-    
+
+    [ObservableProperty]
+    private bool _isBusy;
+
     [ObservableProperty]
     private NvidiaUpdate _nvidiaUpdate = new();
 
     [ObservableProperty]
     private string _updateStatus;
-    
-    [ObservableProperty]
-    private bool _isBusy;
 
     public MainWindowViewModel(GpuService gpuService)
     {
         _gpuService = gpuService;
     }
 
-    public async Task Check()
+    private void SetStatus(string status, bool isBusy = false)
     {
-        IsBusy = true;
+        IsBusy = isBusy;
+        UpdateStatus = status;
+    }
 
+    private void RemoveStatus()
+    {
+        IsBusy = false;
+        UpdateStatus = string.Empty;
+    }
+
+    public async Task GetCurrentGpuInformation()
+    {
         try
         {
-            GpuInformation = _gpuService.GetGpuInformation();
-            var driverInfo = await _gpuService.GetLatestUpdates();
-            NvidiaUpdate.UpdateAvailable = driverInfo.UpdateAvailable;
-            NvidiaUpdate.LatestVersion = driverInfo.LatestVersion;
+            GpuInformation = GpuService.GetGpuInformation();
+
+            await CheckForUpdates();
         }
         catch (Exception)
         {
-            UpdateStatus = "Unable to determine your GPU";
+            SetStatus("Unable to determine your GPU");
         }
         finally
         {
-            IsBusy = false;
+            RemoveStatus();
         }
+    }
+
+    private async Task CheckForUpdates()
+    {
+        SetStatus("Checking for updates...", true);
+        NvidiaUpdate = await _gpuService.GetLatestUpdates();
+    }
+
+    [RelayCommand]
+    private void OpenUrl(Uri downloadUri)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            UseShellExecute = true,
+            FileName = downloadUri.ToString()
+        });
     }
 }

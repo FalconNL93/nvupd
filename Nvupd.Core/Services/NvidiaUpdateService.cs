@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Nvupd.Core.Helpers;
 using Nvupd.Core.Models;
 
 namespace Nvupd.Core.Services;
@@ -9,7 +10,7 @@ public static class NvidiaUpdateService
 
     private static readonly HttpClient Client = new() { BaseAddress = new Uri($"{Url}") };
 
-    private static async Task<NvidiaResponse> FetchNvidiaInfo(int pfId, int osId, bool dch)
+    private static async Task<NvidiaResponse> GetNvidiaInfo(int pfId, int osId, bool dch)
     {
         var dchQuery = dch ? 1 : 0;
         var httpResponse = await Client.GetAsync($"?func=DriverManualLookup&pfid={pfId}&osID={osId}&dch={dchQuery}");
@@ -28,9 +29,9 @@ public static class NvidiaUpdateService
         return downloadInfo;
     }
 
-    public static async Task<DownloadInfo> FetchDownloadInfo(int pfId, int osId, bool dch)
+    private static async Task<DownloadInfo> GetDownloadInfo(int pfId, int osId, bool dch)
     {
-        var downloadInfo = (await FetchNvidiaInfo(pfId, osId, dch)).IDS.FirstOrDefault();
+        var downloadInfo = (await GetNvidiaInfo(pfId, osId, dch)).IDS.FirstOrDefault();
 
         if (downloadInfo == null)
         {
@@ -40,8 +41,16 @@ public static class NvidiaUpdateService
         return downloadInfo.downloadInfo;
     }
 
-    public static bool IsLatest(GpuInformation gpuInformation, DownloadInfo downloadInfo)
+    public static async Task<UpdateData> GetUpdateData()
     {
-        return gpuInformation.NiceDriverVersion == downloadInfo.Version;
+        var gpuInformation = GpuHelper.GetGpuInformation();
+        var downloadInfo = await GetDownloadInfo(gpuInformation.PfId, int.Parse(gpuInformation.OsId), gpuInformation.IsDch);
+
+        return new UpdateData
+        {
+            UpdateAvailable = gpuInformation.NiceDriverVersion == downloadInfo.Version,
+            Version = downloadInfo.Version,
+            DownloadUri = new Uri(downloadInfo.DownloadURL)
+        };
     }
 }

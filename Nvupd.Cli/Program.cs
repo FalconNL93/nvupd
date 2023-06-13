@@ -19,7 +19,7 @@ internal class Program
             Console.WriteLine("Fetching driver information from NVIDIA...");
             try
             {
-                var nvidiaResponse = await NvidiaUpdateService.FetchDownloadInfo(gpu.PfId, int.Parse(gpu.OsId), gpu.IsDch);
+                var nvidiaResponse = await NvidiaUpdateService.GetUpdateData();
                 Console.WriteLine($"Version: {nvidiaResponse.Version}");
             }
             catch (Exception e)

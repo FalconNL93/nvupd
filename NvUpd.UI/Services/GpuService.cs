@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using AutoMapper;
 using Nvupd.Core.Helpers;
 using Nvupd.Core.Models;
 using Nvupd.Core.Services;
@@ -8,24 +9,20 @@ namespace NvUpd.UI.Services;
 
 public class GpuService
 {
-    public GpuService()
+    private readonly IMapper _mapper;
+
+    public GpuService(IMapper mapper)
     {
+        _mapper = mapper;
     }
 
-    public GpuInformation GetGpuInformation()
+    public static GpuInformation GetGpuInformation()
     {
         return GpuHelper.GetGpuInformation();
     }
 
     public async Task<NvidiaUpdate> GetLatestUpdates()
     {
-        var gpuInformation = GpuHelper.GetGpuInformation();
-        var downloadInfo = await NvidiaUpdateService.FetchDownloadInfo(gpuInformation.PfId, int.Parse(gpuInformation.OsId), gpuInformation.IsDch);
-
-        return new NvidiaUpdate
-        {
-            UpdateAvailable = !NvidiaUpdateService.IsLatest(gpuInformation, downloadInfo),
-            LatestVersion = downloadInfo.Version
-        };
+        return _mapper.Map<NvidiaUpdate>(await NvidiaUpdateService.GetUpdateData());
     }
 }

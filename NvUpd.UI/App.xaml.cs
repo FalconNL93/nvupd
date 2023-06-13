@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Nvupd.Core.Services;
+using NvUpd.UI.Configurations;
 using NvUpd.UI.Models;
 using NvUpd.UI.Services;
 using NvUpd.UI.ViewModels;
@@ -25,6 +24,8 @@ public partial class App
 
             services.AddSingleton<GpuService>();
             services.AddSingleton<NvidiaUpdate>();
+
+            services.AddAutoMapper(typeof(AutoMapperConfiguration));
         }).Build();
     }
 
@@ -39,10 +40,9 @@ public partial class App
 
         await AppHost.StartAsync();
         var startupForm = AppHost.Services.GetRequiredService<MainWindow>();
-        var startupFormViewModel = AppHost.Services.GetRequiredService<MainWindowViewModel>();
-        
+
         startupForm.Show();
-        await startupForm.ViewModel.Check();
+        await startupForm.ViewModel.GetCurrentGpuInformation();
 
         base.OnStartup(e);
     }
