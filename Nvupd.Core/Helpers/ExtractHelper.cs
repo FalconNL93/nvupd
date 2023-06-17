@@ -7,19 +7,19 @@ public static class ExtractHelper
     private const string SevenZipExecutable = @"{0}\7-Zip\7z.exe";
     private const string ExtractCommand = @"x {0} -o{1} -y";
     private static readonly string ProgramFiles = Environment.ExpandEnvironmentVariables("%ProgramW6432%");
-    private static readonly string UserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
 
     public static async Task Extract(string inputFile, string outputPath)
     {
-        var command = string.Format(ExtractCommand,
-            @$"{UserProfile}\Downloads\536.23-desktop-win10-win11-64bit-international-dch-whql.exe",
-            @$"{UserProfile}\Downloads\Driver");
+        if (!File.Exists(inputFile))
+        {
+            throw new Exception("Driver file does not exist");
+        }
 
+        var arguments = string.Format(ExtractCommand, inputFile, outputPath);
         var processInfo = new ProcessStartInfo
         {
             FileName = string.Format(SevenZipExecutable, ProgramFiles),
-            Arguments = command
+            Arguments = arguments
         };
 
         var cancellationToken = new CancellationToken();

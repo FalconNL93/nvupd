@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ShellProgressBar" Version="5.2.0" />
+        <PackageReference Include="ShellProgressBar" Version="5.2.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj" />
+        <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj"/>
     </ItemGroup>
 
 </Project>

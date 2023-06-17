@@ -48,7 +48,7 @@ public static class NvidiaUpdateService
 
         return new UpdateData
         {
-            UpdateAvailable = Convert.ToDecimal(downloadInfo.Version) < gpuInformation.NiceDriverVersion,
+            UpdateAvailable = true,
             Version = downloadInfo.Version,
             NiceVersion = gpuInformation.NiceDriverVersion,
             DownloadUri = new Uri(downloadInfo.DownloadURL)

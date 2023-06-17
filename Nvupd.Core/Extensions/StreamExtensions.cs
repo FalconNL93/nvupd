@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Nvupd.Core.Extensions;
+﻿namespace Nvupd.Core.Extensions;
 
 public static class StreamExtensions
 {

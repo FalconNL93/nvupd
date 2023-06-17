@@ -6,18 +6,16 @@ namespace Nvupd.Cli;
 
 public class UpdateHandler
 {
-    private readonly UpdateData _updateData;
     private readonly GpuInformation _gpuInformation;
-    private readonly ProgressBar _progressBar;
     private readonly Progress<float> _progress;
+    private readonly ProgressBar _progressBar;
 
     private readonly ProgressBarOptions _progressOptions = new()
     {
         CollapseWhenFinished = true
     };
 
-    private string DriverFile { get; set; }
-    private string DriverFileOutput { get; set; }
+    private readonly UpdateData _updateData;
 
     public UpdateHandler(UpdateData updateData, GpuInformation gpuInformation)
     {
@@ -27,6 +25,9 @@ public class UpdateHandler
         _progress = new Progress<float>();
         _progress.ProgressChanged += ProgressOnProgressChanged;
     }
+
+    private string DriverFile { get; set; }
+    private string DriverFileOutput { get; set; }
 
     public async Task UpdateAvailable()
     {
@@ -50,7 +51,7 @@ public class UpdateHandler
     {
         DriverFileOutput = Path.GetTempPath() + Guid.NewGuid();
         await ExtractHelper.Extract(DriverFile, DriverFileOutput);
-        
+
         Console.WriteLine($"Extracted to {DriverFileOutput}");
     }
 
