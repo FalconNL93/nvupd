@@ -22,13 +22,13 @@ public static class ExtractHelper
             Arguments = arguments
         };
 
-        var cancellationToken = new CancellationToken();
+        var cancellationToken = new CancellationTokenSource();
         var process = Process.Start(processInfo);
         if (process == null)
         {
             throw new Exception("Error extracting driver file");
         }
 
-        await process.WaitForExitAsync(cancellationToken);
+        await process.WaitForExitAsync(cancellationToken.Token);
     }
 }
