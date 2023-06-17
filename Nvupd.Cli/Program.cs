@@ -26,14 +26,14 @@ internal class Program
             }
             
             var updateHandler = new UpdateHandler(nvidiaResponse, gpu);
-            var driverFile = await updateHandler.DownloadUpdate();
+            await updateHandler.UpdateAvailable();
         }
         catch (Exception e)
         {
             Console.WriteLine("Unable to fetch data from NVIDIA.");
             Console.WriteLine(e);
         }
-        
+
         Console.ReadKey();
     }
 }

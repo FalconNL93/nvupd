@@ -8,50 +8,55 @@ public class UpdateHandler
 {
     private readonly UpdateData _updateData;
     private readonly GpuInformation _gpuInformation;
-    private string TempFile { get; set; }
-    private string FileName { get; set; }
+    private readonly ProgressBar _progressBar;
+    private readonly Progress<float> _progress;
 
     private readonly ProgressBarOptions _progressOptions = new()
     {
         CollapseWhenFinished = true
     };
 
+    private string DriverFile { get; set; }
+    private string DriverFileOutput { get; set; }
+
     public UpdateHandler(UpdateData updateData, GpuInformation gpuInformation)
     {
         _updateData = updateData;
         _gpuInformation = gpuInformation;
+        _progressBar = new ProgressBar(10000, "Downloading", _progressOptions);
+        _progress = new Progress<float>();
+        _progress.ProgressChanged += ProgressOnProgressChanged;
     }
 
-    public async Task<string> DownloadUpdate()
+    public async Task UpdateAvailable()
     {
         Console.WriteLine($"An update is available for {_gpuInformation.Name}");
         Console.WriteLine("Starting download...");
 
-        return await DownloadDriver();
+        await DownloadDriver();
+        await ExtractPackage();
     }
 
-    private async Task<string> DownloadDriver()
+    private async Task DownloadDriver()
     {
-        FileName = Path.GetFileName(_updateData.DownloadUri.LocalPath);
-        TempFile = $"{Path.GetTempPath()}{TempFile}.exe";
-
-        await StartDownload();
-
-        return TempFile;
+        DriverFile = Path.GetTempPath() + Guid.NewGuid() + ".exe";
+        _progressBar.Message = $"Downloading {_updateData.DownloadUri}";
+        await Downloader.DownloadFile(DriverFile, _updateData.DownloadUri.ToString(), _progress);
+        _progressBar.Dispose();
+        Console.WriteLine($"File saved to {DriverFile}");
     }
 
-    private async Task StartDownload()
+    private async Task ExtractPackage()
     {
-        var progress = new Progress<float>();
-        var progressBar = new ProgressBar(10000, "Downloading", _progressOptions);
+        DriverFileOutput = Path.GetTempPath() + Guid.NewGuid();
+        await ExtractHelper.Extract(DriverFile, DriverFileOutput);
+        
+        Console.WriteLine($"Extracted to {DriverFileOutput}");
+    }
 
-        progress.ProgressChanged += (sender, p) =>
-        {
-            var progressFloat = progressBar.AsProgress<float>();
-            progressFloat.Report(p);
-        };
-
-        progressBar.Message = $"Downloading {_updateData.DownloadUri.LocalPath}...";
-        await Downloader.DownloadFile(TempFile, _updateData.DownloadUri.ToString(), progress);
+    private void ProgressOnProgressChanged(object? sender, float e)
+    {
+        var progressBar = _progressBar.AsProgress<float>();
+        progressBar.Report(e);
     }
 }
