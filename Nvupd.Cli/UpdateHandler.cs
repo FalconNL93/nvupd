@@ -29,20 +29,20 @@ public class UpdateHandler
     private string DriverFile { get; set; }
     private string DriverFileOutput { get; set; }
 
-    public async Task UpdateAvailable()
+    public async Task UpdateAvailable(CancellationToken cancellationToken)
     {
         Console.WriteLine($"An update is available for {_gpuInformation.Name}");
         Console.WriteLine("Starting download...");
 
-        await DownloadDriver();
+        await DownloadDriver(cancellationToken);
         await ExtractPackage();
     }
 
-    private async Task DownloadDriver()
+    private async Task DownloadDriver(CancellationToken cancellationToken)
     {
         DriverFile = Path.GetTempPath() + Guid.NewGuid() + ".exe";
         _progressBar.Message = $"Downloading {_updateData.DownloadUri}";
-        await Downloader.DownloadFile(DriverFile, _updateData.DownloadUri.ToString(), _progress);
+        await Downloader.DownloadFile(DriverFile, _updateData.DownloadUri.ToString(), _progress, cancellationToken);
         _progressBar.Dispose();
         Console.WriteLine($"File saved to {DriverFile}");
     }

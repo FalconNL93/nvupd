@@ -8,6 +8,8 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
+        var cancellationToken = new CancellationTokenSource();
+        Console.CancelKeyPress += (_, _) => { cancellationToken.Cancel(); };
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
         var gpu = GpuHelper.GetGpuInformation();
@@ -26,7 +28,7 @@ internal class Program
             }
 
             var updateHandler = new UpdateHandler(nvidiaResponse, gpu);
-            await updateHandler.UpdateAvailable();
+            await updateHandler.UpdateAvailable(cancellationToken.Token);
         }
         catch (Exception e)
         {
