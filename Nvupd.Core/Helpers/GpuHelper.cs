@@ -1,4 +1,5 @@
-﻿using System.Management;
+﻿using System.Globalization;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -71,8 +72,10 @@ public static class GpuHelper
         return gpuInformation;
     }
 
-    private static string ToNiceVersion(string driverVersion)
+    private static decimal ToNiceVersion(string driverVersion)
     {
-        return driverVersion.Remove(0, 6).Replace(".", "").Insert(3, ".");
+        var niceVersion = driverVersion.Remove(0, 6).Replace(".", "").Insert(3, ".");
+
+        return Convert.ToDecimal(niceVersion, CultureInfo.InvariantCulture);
     }
 }

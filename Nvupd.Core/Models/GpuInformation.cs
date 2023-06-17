@@ -15,7 +15,7 @@ public class GpuInformation
     /// <summary>
     ///     Show short driver version
     /// </summary>
-    public string NiceDriverVersion { get; set; }
+    public decimal NiceDriverVersion { get; set; }
 
     /// <summary>
     ///     If installed driver is DCH

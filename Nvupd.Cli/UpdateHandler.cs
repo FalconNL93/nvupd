@@ -8,8 +8,8 @@ public class UpdateHandler
 {
     private readonly UpdateData _updateData;
     private readonly GpuInformation _gpuInformation;
-    private readonly ProgressBar _progressBar;
-    private readonly Progress<float> _progress;
+    private string TempFile { get; set; }
+    private string FileName { get; set; }
 
     private readonly ProgressBarOptions _progressOptions = new()
     {
@@ -20,31 +20,38 @@ public class UpdateHandler
     {
         _updateData = updateData;
         _gpuInformation = gpuInformation;
-        _progressBar = new ProgressBar(10000, "Downloading", _progressOptions);
-        _progress = new Progress<float>();
-        _progress.ProgressChanged += ProgressOnProgressChanged;
     }
 
-    public async Task UpdateAvailable()
+    public async Task<string> DownloadUpdate()
     {
         Console.WriteLine($"An update is available for {_gpuInformation.Name}");
         Console.WriteLine("Starting download...");
 
-        await DownloadDriver();
+        return await DownloadDriver();
     }
 
-    private async Task DownloadDriver()
+    private async Task<string> DownloadDriver()
     {
-        var tempFile = Path.GetTempPath() + Guid.NewGuid() + ".exe";
-        _progressBar.Message = $"Downloading {_updateData.DownloadUri}";
-        await Downloader.DownloadFile(tempFile, _updateData.DownloadUri.ToString(), _progress);
-        _progressBar.Dispose();
-        Console.WriteLine($"File saved to {tempFile}");
+        FileName = Path.GetFileName(_updateData.DownloadUri.LocalPath);
+        TempFile = $"{Path.GetTempPath()}{TempFile}.exe";
+
+        await StartDownload();
+
+        return TempFile;
     }
 
-    private void ProgressOnProgressChanged(object? sender, float e)
+    private async Task StartDownload()
     {
-        var progressBar = _progressBar.AsProgress<float>();
-        progressBar.Report(e);
+        var progress = new Progress<float>();
+        var progressBar = new ProgressBar(10000, "Downloading", _progressOptions);
+
+        progress.ProgressChanged += (sender, p) =>
+        {
+            var progressFloat = progressBar.AsProgress<float>();
+            progressFloat.Report(p);
+        };
+
+        progressBar.Message = $"Downloading {_updateData.DownloadUri.LocalPath}...";
+        await Downloader.DownloadFile(TempFile, _updateData.DownloadUri.ToString(), progress);
     }
 }
