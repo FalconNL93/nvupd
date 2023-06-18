@@ -1,0 +1,20 @@
+﻿<Page x:Class="NvUpd.UI.Views.UpdatePage"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      Title="UpdatePage" Height="450" Width="800">
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="Downloading update..." />
+            <TextBlock Text="{Binding ViewModel.NvidiaUpdate.DownloadUri}" />
+            <Button Content="Start" Command="{Binding ViewModel.DownloadUpdateCommand}" />
+            <TextBlock Text="{Binding ViewModel.Status}" />
+            <Separator/>
+            <ProgressBar x:Name="DownloadProgress" Value="{Binding ViewModel.Progress}" Maximum="10000" Height="20" />
+        </StackPanel>
+
+    </Grid>
+</Page>

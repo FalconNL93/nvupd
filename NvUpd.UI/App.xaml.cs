@@ -21,6 +21,8 @@ public partial class App
         {
             services.AddSingleton<MainWindow>();
             services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<UpdatePage>();
+            services.AddTransient<UpdatePageViewModel>();
 
             services.AddSingleton<GpuService>();
             services.AddSingleton<NvidiaUpdate>();

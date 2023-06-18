@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Nvupd.Core.Models;
 using NvUpd.UI.Models;
 using NvUpd.UI.Services;
+using NvUpd.UI.Views;
 
 namespace NvUpd.UI.ViewModels;
 
 public partial class MainWindowViewModel : ObservableRecipient
 {
     private readonly GpuService _gpuService;
+    private readonly UpdatePage _updatePage;
 
     [ObservableProperty]
     private GpuInformation _gpuInformation = new();
@@ -24,10 +27,14 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     [ObservableProperty]
     private string _updateStatus;
+    
+    [ObservableProperty]
+    private Page _page;
 
-    public MainWindowViewModel(GpuService gpuService)
+    public MainWindowViewModel(GpuService gpuService, UpdatePage updatePage)
     {
         _gpuService = gpuService;
+        _updatePage = updatePage;
     }
 
     private void SetStatus(string status, bool isBusy = false)
@@ -74,5 +81,12 @@ public partial class MainWindowViewModel : ObservableRecipient
             UseShellExecute = true,
             FileName = downloadUri.ToString()
         });
+    }
+
+    [RelayCommand]
+    private void DownloadUpdate()
+    {
+        _updatePage.ViewModel.NvidiaUpdate = NvidiaUpdate;
+        Page = _updatePage;
     }
 }

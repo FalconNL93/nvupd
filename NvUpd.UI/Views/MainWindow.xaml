@@ -40,7 +40,8 @@
                     <Run Text="{Binding ViewModel.NvidiaUpdate.LatestVersion}" />
                 </TextBlock>
 
-                <TextBlock>
+                <TextBlock
+                    Visibility="{Binding ViewModel.NvidiaUpdate.UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Run FontWeight="Bold" Text="Download:" />
                     <Hyperlink
                         NavigateUri="{Binding ViewModel.NvidiaUpdate.DownloadUri}"
@@ -49,6 +50,9 @@
                         <TextBlock Text="{Binding ViewModel.NvidiaUpdate.DownloadUri}" />
                     </Hyperlink>
                 </TextBlock>
+
+                <Button Command="{Binding ViewModel.DownloadUpdateCommand}">Download update</Button>
+                <Frame Content="{Binding ViewModel.Page}" />
             </StackPanel>
         </StackPanel>
     </Grid>
