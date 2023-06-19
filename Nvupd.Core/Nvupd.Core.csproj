@@ -20,4 +20,9 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\FalconNL93.Extensions\FalconNL93.Toolkit\FalconNL93.Toolkit.csproj" />
+      <ProjectReference Include="..\..\Toolkit\FalconNL93.Toolkit\FalconNL93.Toolkit.csproj" />
+    </ItemGroup>
+
 </Project>

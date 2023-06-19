@@ -7,7 +7,7 @@ namespace Nvupd.Cli;
 public class UpdateHandler
 {
     private readonly GpuInformation _gpuInformation;
-    private readonly Progress<float> _progress;
+    private readonly Progress<float>? _progress;
     private readonly ProgressBar _progressBar;
 
     private readonly ProgressBarOptions _progressOptions = new()
@@ -36,6 +36,16 @@ public class UpdateHandler
 
         await DownloadDriver(cancellationToken);
         await ExtractPackage();
+        
+        Console.WriteLine("Press Y to start driver install");
+        var userInput = Console.ReadKey().Key;
+
+        if (userInput != ConsoleKey.Y)
+        {
+            Environment.Exit(0);
+        }
+        
+        Console.WriteLine("Starting installation...");
     }
 
     private async Task DownloadDriver(CancellationToken cancellationToken)

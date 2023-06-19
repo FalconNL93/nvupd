@@ -13,7 +13,7 @@ public partial class UpdatePageViewModel : ObservableRecipient
     private NvidiaUpdate _nvidiaUpdate;
 
     [ObservableProperty]
-    private Progress<float> _progress = new();
+    private Progress<float>? _progress = new();
 
     [ObservableProperty]
     private string _status;

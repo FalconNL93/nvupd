@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nvupd.Core", "Nvupd.Core\Nv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NvUpd.UI", "NvUpd.UI\NvUpd.UI.csproj", "{5CEDB151-F985-4335-8852-904EA70E43D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FalconNL93.Toolkit", "..\Toolkit\FalconNL93.Toolkit\FalconNL93.Toolkit.csproj", "{F033A9AA-58B0-4369-95B7-E0AD12948207}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5CEDB151-F985-4335-8852-904EA70E43D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CEDB151-F985-4335-8852-904EA70E43D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CEDB151-F985-4335-8852-904EA70E43D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F033A9AA-58B0-4369-95B7-E0AD12948207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F033A9AA-58B0-4369-95B7-E0AD12948207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F033A9AA-58B0-4369-95B7-E0AD12948207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F033A9AA-58B0-4369-95B7-E0AD12948207}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
