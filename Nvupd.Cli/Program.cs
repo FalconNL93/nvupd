@@ -1,29 +1,56 @@
 ﻿using System.Globalization;
+using FalconNL93.Toolkit.Helpers;
 using Nvupd.Core.Helpers;
 using Nvupd.Core.Services;
+using Serilog;
 
 namespace Nvupd.Cli;
 
 internal class Program
 {
+    private static AppConfig AppConfig { get; set; } = new();
+
+
     private static async Task Main(string[] args)
     {
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+        
+        Log.Information("Reading configuration");
+        await Task.Delay(3000);
+        ConsoleHelper.RewriteLine("Done!");
+
+        try
+        {
+            AppConfig = ConfigHelper.ReadConfig() ?? new AppConfig();
+        }
+        catch (Exception e)
+        {
+            Log.Warning("Unable to parse configuration, using default configuration");
+        }
+
         var cancellationToken = new CancellationTokenSource();
         Console.CancelKeyPress += (_, _) => { cancellationToken.Cancel(); };
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
         var gpu = GpuHelper.GetGpuInformation();
-        Console.WriteLine($"Device: {gpu.Name}");
-        Console.WriteLine($"Driver installed: {gpu.NiceDriverVersion}");
+        Log.Information("Device: {GpuName}", gpu.Name);
+        Log.Information("Driver installed: {GpuNiceDriverVersion}", gpu.NiceDriverVersion);
 
         try
         {
             var nvidiaResponse = await NvidiaUpdateService.GetUpdateData();
-            Console.WriteLine($"Driver available: {nvidiaResponse.Version}");
+            Log.Information("Driver available: {NvidiaResponseVersion}", nvidiaResponse.Version);
 
             if (!nvidiaResponse.UpdateAvailable)
             {
-                Console.WriteLine("You are running the latest driver.");
+                Log.Information("You are running the latest driver");
+                return;
+            }
+
+            if (!AppConfig.AutoDownload)
+            {
                 return;
             }
 
@@ -32,8 +59,7 @@ internal class Program
         }
         catch (Exception e)
         {
-            Console.WriteLine("Unable to fetch data from NVIDIA.");
-            Console.WriteLine(e);
+            Log.Error(e, "Error");
         }
 
         Console.ReadKey();
