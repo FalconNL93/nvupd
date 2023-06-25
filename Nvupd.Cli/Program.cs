@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using FalconNL93.Toolkit.Helpers;
 using Nvupd.Core.Helpers;
 using Nvupd.Core.Services;
 using Serilog;
@@ -19,7 +18,6 @@ internal class Program
         
         Log.Information("Reading configuration");
         await Task.Delay(3000);
-        ConsoleHelper.RewriteLine("Done!");
 
         try
         {

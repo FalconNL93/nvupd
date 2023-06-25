@@ -20,10 +20,15 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+        <Page Update="Views\Pages\UpdatePage.xaml">
+          <Generator>MSBuild:Compile</Generator>
+          <XamlRuntime>Wpf</XamlRuntime>
+          <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj" />
+      <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj" />
     </ItemGroup>
 
 </Project>

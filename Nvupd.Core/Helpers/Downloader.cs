@@ -1,6 +1,4 @@
-﻿using FalconNL93.Toolkit.Models;
-
-namespace Nvupd.Core.Helpers;
+﻿namespace Nvupd.Core.Helpers;
 
 public class Downloader
 {

@@ -1,8 +1,8 @@
 ﻿<Window
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
-    Height="450"
+    Height="455"
     Title="NVIDIA Driver Updater"
-    Width="800"
+    Width="750"
     ResizeMode="CanMinimize"
     mc:Ignorable="d"
     x:Class="NvUpd.UI.Views.MainWindow"
@@ -13,47 +13,19 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
-    <Grid>
-        <StackPanel Margin="5,5">
+    <Grid Margin="5,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Row="0">
             <StackPanel>
-                <TextBlock
-                    Visibility="{Binding ViewModel.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Run FontWeight="Bold" Text="Status:" />
-                    <Run Text="{Binding ViewModel.UpdateStatus}" />
-                </TextBlock>
+                <TextBlock Text="{Binding ViewModel.AppTitle}" FontWeight="Bold" />
             </StackPanel>
-            <StackPanel>
-                <TextBlock>
-                    <Run FontWeight="Bold" Text="GPU Information:" />
-                    <Run Text="{Binding ViewModel.GpuInformation.Name}" />
-                </TextBlock>
-
-                <TextBlock>
-                    <Run FontWeight="Bold" Text="Driver:" />
-                    <Run Text="{Binding ViewModel.GpuInformation.NiceDriverVersion}" />
-                </TextBlock>
+            <StackPanel VerticalAlignment="Bottom">
+                <Separator VerticalAlignment="Bottom" />
             </StackPanel>
-
-            <StackPanel>
-                <TextBlock>
-                    <Run FontWeight="Bold" Text="Latest drivers:" />
-                    <Run Text="{Binding ViewModel.NvidiaUpdate.LatestVersion}" />
-                </TextBlock>
-
-                <TextBlock
-                    Visibility="{Binding ViewModel.NvidiaUpdate.UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Run FontWeight="Bold" Text="Download:" />
-                    <Hyperlink
-                        NavigateUri="{Binding ViewModel.NvidiaUpdate.DownloadUri}"
-                        Command="{Binding ViewModel.OpenUrlCommand}"
-                        CommandParameter="{Binding ViewModel.NvidiaUpdate.DownloadUri}">
-                        <TextBlock Text="{Binding ViewModel.NvidiaUpdate.DownloadUri}" />
-                    </Hyperlink>
-                </TextBlock>
-
-                <Button Command="{Binding ViewModel.DownloadUpdateCommand}">Download update</Button>
-                <Frame Content="{Binding ViewModel.Page}" />
-            </StackPanel>
-        </StackPanel>
+        </Grid>
+        <Frame Grid.Row="1" Content="{Binding ViewModel.Page, Mode=OneWay}" />
     </Grid>
 </Window>

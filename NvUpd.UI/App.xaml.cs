@@ -7,6 +7,7 @@ using NvUpd.UI.Models;
 using NvUpd.UI.Services;
 using NvUpd.UI.ViewModels;
 using NvUpd.UI.Views;
+using NvUpd.UI.Views.Pages;
 
 namespace NvUpd.UI;
 
@@ -19,10 +20,8 @@ public partial class App
     {
         AppHost = Host.CreateDefaultBuilder().ConfigureServices((_, services) =>
         {
-            services.AddSingleton<MainWindow>();
-            services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<UpdatePage>();
-            services.AddTransient<UpdatePageViewModel>();
+            services.AddWindows();
+            services.AddPages();
 
             services.AddSingleton<GpuService>();
             services.AddSingleton<NvidiaUpdate>();
@@ -42,9 +41,8 @@ public partial class App
 
         await AppHost.StartAsync();
         var startupForm = AppHost.Services.GetRequiredService<MainWindow>();
-
+        startupForm.ViewModel.Page = AppHost.Services.GetRequiredService<DefaultPage>();
         startupForm.Show();
-        await startupForm.ViewModel.GetCurrentGpuInformation();
 
         base.OnStartup(e);
     }
@@ -58,5 +56,23 @@ public partial class App
 
         await AppHost.StopAsync();
         base.OnExit(e);
+    }
+}
+
+public static class ServiceExtensions
+{
+    public static void AddWindows(this IServiceCollection services)
+    {
+        services.AddSingleton<MainWindow>();
+        services.AddTransient<MainWindowViewModel>();
+    }
+
+    public static void AddPages(this IServiceCollection services)
+    {
+        services.AddTransient<UpdatePage>();
+        services.AddTransient<UpdatePageViewModel>();
+        
+        services.AddTransient<DefaultPage>();
+        services.AddTransient<DefaultPageViewModel>();
     }
 }

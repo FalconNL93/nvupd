@@ -4,11 +4,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Nvupd.Core.Helpers;
 using NvUpd.UI.Models;
+using NvUpd.UI.Services;
+using NvUpd.UI.Views;
 
 namespace NvUpd.UI.ViewModels;
 
 public partial class UpdatePageViewModel : ObservableRecipient
 {
+
     [ObservableProperty]
     private NvidiaUpdate _nvidiaUpdate;
 
@@ -17,14 +20,4 @@ public partial class UpdatePageViewModel : ObservableRecipient
 
     [ObservableProperty]
     private string _status;
-
-    public UpdatePageViewModel()
-    {
-    }
-
-    [RelayCommand]
-    private async Task DownloadUpdate()
-    {
-        await Downloader.DownloadFile(@"C:\Users\pvand\Downloads\nvidia.exe", _nvidiaUpdate.DownloadUri.ToString(), _progress);
-    }
 }
