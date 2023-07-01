@@ -2,40 +2,30 @@
 
 public static class ConsoleX
 {
-    public static void WriteHeader()
+    public static bool YesNo(string text, ConsoleKey defaultValue = ConsoleKey.N)
     {
-        Console.WriteLine("=================");
-    }
-}
-
-public class ConsoleSpinner
-{
-    private int _counter;
-
-    public ConsoleSpinner()
-    {
-        _counter = 0;
-    }
-
-    public void Turn()
-    {
-        _counter++;
-        switch (_counter % 4)
+        var acceptedKeys = new List<ConsoleKey>()
         {
-            case 0:
-                Console.Write("/");
-                break;
-            case 1:
-                Console.Write("-");
-                break;
-            case 2:
-                Console.Write("\\");
-                break;
-            case 3:
-                Console.Write("|");
-                break;
+            ConsoleKey.Y,
+            ConsoleKey.N,
+            ConsoleKey.Enter,
+            ConsoleKey.Escape
+        };
+
+        var choices = defaultValue == ConsoleKey.Y ? "Y/n" : "y/N";
+        Console.WriteLine($"{text} {choices}");
+        var userInput = Console.ReadKey(true).Key;
+        while (!acceptedKeys.Exists(x => x == userInput))
+        {
+            Console.WriteLine($"{text} {choices}");
+            userInput = Console.ReadKey(true).Key;
         }
 
-        Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+        return userInput switch
+        {
+            ConsoleKey.Escape => false,
+            ConsoleKey.Y => true,
+            _ => defaultValue == ConsoleKey.Y
+        };
     }
 }
