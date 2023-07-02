@@ -1,5 +1,7 @@
-﻿using Nvupd.Core.Helpers;
+﻿using System.Diagnostics;
+using Nvupd.Core.Helpers;
 using Nvupd.Core.Models;
+using Serilog;
 using ShellProgressBar;
 
 namespace Nvupd.Cli;
@@ -28,26 +30,57 @@ public class UpdateHandler
 
     public async Task UpdateAvailable(CancellationToken cancellationToken)
     {
-        Console.WriteLine($"An update is available for {_gpuInformation.Name}.");
+        Log.Information("An update is available for {GpuName}", _gpuInformation.Name);
         var downloadUpdate = ConsoleX.YesNo("Do you want to download the update?");
         if (!downloadUpdate)
         {
-            Console.WriteLine("Cancelled");
+            Program.OnCancelEvent();
             return;
         }
 
-        Console.WriteLine("Starting download...");
+        Log.Information("Starting download...");
         await DownloadDriver(cancellationToken);
+
+        Log.Information("Extracting driver...");
         await ExtractPackage();
 
-        Console.WriteLine("Press Y to start driver install");
-        var userInput = Console.ReadKey().Key;
-        if (userInput != ConsoleKey.Y)
+        var startInstaller = ConsoleX.YesNo("Do you want to install the driver?");
+        if (!startInstaller)
         {
-            Environment.Exit(0);
+            Program.OnCancelEvent();
+            return;
         }
 
-        Console.WriteLine("Starting installation...");
+        Log.Information("Starting installation...");
+        await InstallDriver(new DriverComponents(new[]
+        {
+            Components.Driver
+        }), cancellationToken);
+    }
+
+    private async Task InstallDriver(
+        DriverComponents components,
+        CancellationToken cancellationTokenSource
+    )
+    {
+        var processInfo = new ProcessStartInfo
+        {
+            Arguments = "-s -n",
+            FileName = @$"{DriverFileOutput}\setup.exe",
+            WorkingDirectory = DriverFileOutput
+        };
+
+        if (!File.Exists(processInfo.FileName))
+        {
+            Log.Error("Unable to find {FileName}", processInfo.FileName);
+        }
+
+        Log.Information("Running installer...");
+        var process = new Process { StartInfo = processInfo };
+        process.Start();
+        await process.WaitForExitAsync(cancellationTokenSource);
+
+        Log.Information("Installation exited with code {ExitCode}", process.ExitCode);
     }
 
     private async Task DownloadDriver(CancellationToken cancellationToken)
@@ -55,19 +88,33 @@ public class UpdateHandler
         _progressBar = new ProgressBar(10000, "Downloading", _progressOptions);
         _progress = new Progress<float>();
         _progress.ProgressChanged += ProgressOnProgressChanged;
-        DriverFile = Path.GetTempPath() + Guid.NewGuid() + ".exe";
+        DriverFile = Program.TempDirectory + Guid.NewGuid() + ".exe";
+
+        var driverDirectory = Path.GetDirectoryName(DriverFile);
+        if (!Directory.Exists(driverDirectory))
+        {
+            try
+            {
+                Directory.CreateDirectory(driverDirectory);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Unable to create directory", driverDirectory);
+            }
+        }
+
         _progressBar.Message = $"Downloading {_updateData.DownloadUri}";
         await Downloader.DownloadFile(DriverFile, _updateData.DownloadUri.ToString(), _progress, cancellationToken);
         _progressBar.Dispose();
-        Console.WriteLine($"File saved to {DriverFile}");
+        Log.Information("File saved to {DriverFile}", DriverFile);
     }
 
     private async Task ExtractPackage()
     {
-        DriverFileOutput = Path.GetTempPath() + Guid.NewGuid();
+        DriverFileOutput = Program.TempDirectory + Guid.NewGuid();
         await ExtractHelper.Extract(DriverFile, DriverFileOutput);
 
-        Console.WriteLine($"Extracted to {DriverFileOutput}");
+        Log.Information("Extracted to {DriverFileOutput}", DriverFileOutput);
     }
 
     private void ProgressOnProgressChanged(object? sender, float e)

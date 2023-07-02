@@ -9,8 +9,10 @@ public class Downloader
         CancellationToken cancellationToken = default
     )
     {
-        using var client = new HttpClient();
-        client.Timeout = TimeSpan.FromMinutes(5);
-        
+        var httpClient = new HttpClient();
+        var httpResult = await httpClient.GetAsync(downloadUrl, cancellationToken);
+        await using var resultStream = await httpResult.Content.ReadAsStreamAsync(cancellationToken);
+        await using var fileStream = File.Create(path);
+        await resultStream.CopyToAsync(fileStream, cancellationToken);
     }
 }

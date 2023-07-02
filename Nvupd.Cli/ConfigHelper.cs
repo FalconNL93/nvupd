@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Text.Json;
-using Serilog;
 
 namespace Nvupd.Cli;
 
@@ -14,7 +13,7 @@ public static class ConfigHelper
     private static readonly string? AppDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     private static readonly string SettingsFile = @$"{AppDirectory}\settings.json";
 
-    public static AppConfig? ReadConfig()
+    public static AppConfig ReadConfig()
     {
         var configExists = File.Exists(SettingsFile);
         if (!configExists)
