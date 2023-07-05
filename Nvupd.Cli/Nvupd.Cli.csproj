@@ -21,4 +21,8 @@
         <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Helpers\" />
+    </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
-﻿using Nvupd.Core.Helpers;
+﻿using Nvupd.Cli.Helpers;
+using Nvupd.Core.Helpers;
 using Nvupd.Core.Services;
 using Serilog;
 
@@ -12,7 +13,7 @@ public static class App
     public static async Task Run(CancellationTokenSource cancellationToken)
     {
         Log.Information("{AppName} v{Version}", Program.AppAssembly.Name, Program.AppVersion);
-
+        
         try
         {
             AppConfig = ConfigHelper.ReadConfig();
