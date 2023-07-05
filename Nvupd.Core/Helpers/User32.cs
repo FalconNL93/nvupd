@@ -27,6 +27,6 @@ public enum MessageBoxResults
 
 public class User32
 {
-    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [LibraryImport("user32.dll", SetLastError = true)]
     public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 }
