@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0-windows</TargetFramework>
+        <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Version>1.2.3</Version>
@@ -10,19 +10,20 @@
         <FileVersion>1.2.3</FileVersion>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
-    
+
 
     <ItemGroup>
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-        <PackageReference Include="ShellProgressBar" Version="5.2.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0"/>
+        <PackageReference Include="ShellProgressBar" Version="5.2.0"/>
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj" />
+        <ProjectReference Include="..\Nvupd.Core\Nvupd.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Helpers\" />
+        <Folder Include="Helpers\"/>
     </ItemGroup>
 
 </Project>

@@ -45,10 +45,11 @@ public static class NvidiaUpdateService
     {
         var gpuInformation = GpuHelper.GetGpuInformation();
         var downloadInfo = await GetDownloadInfo(gpuInformation.PfId, int.Parse(gpuInformation.OsId), gpuInformation.IsDch);
+        var versionDecimal = decimal.Parse(downloadInfo.Version);
 
         return new UpdateData
         {
-            UpdateAvailable = true,
+            UpdateAvailable = gpuInformation.NiceDriverVersion != versionDecimal,
             Version = downloadInfo.Version,
             NiceVersion = gpuInformation.NiceDriverVersion,
             DownloadUri = new Uri(downloadInfo.DownloadURL)

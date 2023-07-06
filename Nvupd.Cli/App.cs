@@ -1,5 +1,4 @@
-﻿using Nvupd.Cli.Helpers;
-using Nvupd.Core.Helpers;
+﻿using Nvupd.Core.Helpers;
 using Nvupd.Core.Services;
 using Serilog;
 
@@ -12,11 +11,12 @@ public static class App
 
     public static async Task Run(CancellationTokenSource cancellationToken)
     {
-        Log.Information("{AppName} v{Version}", Program.AppAssembly.Name, Program.AppVersion);
+        Log.Information("{AppName} {Version}", Program.AppAssembly.Name, Program.AppVersion);
         
         try
         {
             AppConfig = ConfigHelper.ReadConfig();
+            Log.Debug("Configuration parsed");
         }
         catch (Exception e)
         {
@@ -40,6 +40,8 @@ public static class App
                 return;
             }
 
+            Log.Information("An update is available");
+            Log.Information("Driver package: {DownloadUrl}", nvidiaResponse.DownloadUri.ToString());
             if (!AppConfig.AutoDownload)
             {
                 return;

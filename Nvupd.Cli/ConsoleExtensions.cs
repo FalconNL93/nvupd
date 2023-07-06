@@ -3,7 +3,7 @@
 public static class ConsoleX
 {
     /// <summary>
-    /// Asks the user a yes or no question
+    ///     Asks the user a yes or no question
     /// </summary>
     /// <param name="text">The question to print</param>
     /// <param name="defaultValue">The default choice of the question</param>
@@ -15,7 +15,7 @@ public static class ConsoleX
         string invalidChoice = ""
     )
     {
-        var acceptedKeys = new List<ConsoleKey>()
+        var acceptedKeys = new List<ConsoleKey>
         {
             ConsoleKey.Y,
             ConsoleKey.N,
@@ -31,7 +31,7 @@ public static class ConsoleX
             Console.WriteLine(string.IsNullOrEmpty(invalidChoice)
                 ? $"{text} {choices}"
                 : invalidChoice);
-            
+
             userInput = Console.ReadKey(true).Key;
         }
 

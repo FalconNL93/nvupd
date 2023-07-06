@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Nvupd.Cli.Helpers;
+namespace Nvupd.Core.Helpers;
 
 public class MessageBoxTypes
 {
@@ -27,6 +27,6 @@ public enum MessageBoxResults
 
 public class User32
 {
-    [LibraryImport("user32.dll", SetLastError = true)]
+    [DllImport("user32.dll", SetLastError = true)]
     public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 }

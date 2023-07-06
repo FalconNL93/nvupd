@@ -9,8 +9,6 @@ namespace Nvupd.Cli;
 public class UpdateHandler
 {
     private readonly GpuInformation _gpuInformation;
-    private Progress<float>? _progress;
-    private ProgressBar _progressBar;
 
     private readonly ProgressBarOptions _progressOptions = new()
     {
@@ -18,6 +16,8 @@ public class UpdateHandler
     };
 
     private readonly UpdateData _updateData;
+    private Progress<float>? _progress;
+    private ProgressBar _progressBar;
 
     public UpdateHandler(UpdateData updateData, GpuInformation gpuInformation)
     {
@@ -30,19 +30,12 @@ public class UpdateHandler
 
     public async Task UpdateAvailable(CancellationToken cancellationToken)
     {
-        Log.Information("An update is available for {GpuName}", _gpuInformation.Name);
-        var downloadUpdate = ConsoleX.YesNo("Do you want to download the update?");
-        if (!downloadUpdate)
-        {
-            Program.OnCancelEvent();
-            return;
-        }
-
         Log.Information("Starting download...");
         await DownloadDriver(cancellationToken);
 
         Log.Information("Extracting driver...");
-        await ExtractPackage();
+        var outputDirectory = await ExtractPackage();
+        Log.Information("Driver package extracted to: {OutputDirectory}", outputDirectory);
 
         var startInstaller = ConsoleX.YesNo("Do you want to install the driver?");
         if (!startInstaller)
@@ -109,12 +102,12 @@ public class UpdateHandler
         Log.Information("File saved to {DriverFile}", DriverFile);
     }
 
-    private async Task ExtractPackage()
+    private async Task<string> ExtractPackage()
     {
         DriverFileOutput = Program.TempDirectory + Guid.NewGuid();
         await ExtractHelper.Extract(DriverFile, DriverFileOutput);
 
-        Log.Information("Extracted to {DriverFileOutput}", DriverFileOutput);
+        return DriverFileOutput;
     }
 
     private void ProgressOnProgressChanged(object? sender, float e)
