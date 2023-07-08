@@ -1,25 +1,30 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using Nvupd.Core.Helpers;
 using Nvupd.Core.Models;
+using Serilog;
 
 namespace Nvupd.Core.Services;
 
 public static class NvidiaUpdateService
 {
     private const string Url = "https://gfwsl.geforce.com/services_toolkit/services/com/nvidia/services/AjaxDriverService.php";
+    private const string QueryString = "?func=DriverManualLookup&pfid={0}&osID={1}&dch={2}";
 
     private static readonly HttpClient Client = new() { BaseAddress = new Uri($"{Url}") };
 
     private static async Task<NvidiaResponse> GetNvidiaInfo(int pfId, int osId, bool dch)
     {
         var dchQuery = dch ? 1 : 0;
-        var httpResponse = await Client.GetAsync($"?func=DriverManualLookup&pfid={pfId}&osID={osId}&dch={dchQuery}");
+        var httpResponse = await Client.GetAsync(string.Format(QueryString, pfId, osId, dchQuery));
+        Log.Verbose("Request URI: {RequestUri}", httpResponse.RequestMessage.RequestUri);
         if (!httpResponse.IsSuccessStatusCode)
         {
             throw new Exception("Invalid status code");
         }
-
+        
         var response = await httpResponse.Content.ReadAsStringAsync();
+        Log.Verbose("Response: {Response}", response);
         var downloadInfo = JsonSerializer.Deserialize<NvidiaResponse>(response);
         if (downloadInfo == null)
         {

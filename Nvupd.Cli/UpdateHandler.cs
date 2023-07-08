@@ -78,10 +78,7 @@ public class UpdateHandler
 
     private async Task DownloadDriver(CancellationToken cancellationToken)
     {
-        _progressBar = new ProgressBar(10000, "Downloading", _progressOptions);
-        _progress = new Progress<float>();
-        _progress.ProgressChanged += ProgressOnProgressChanged;
-        DriverFile = Program.TempDirectory + Guid.NewGuid() + ".exe";
+        DriverFile = SystemHelper.TempDirectory + Guid.NewGuid() + ".exe";
 
         var driverDirectory = Path.GetDirectoryName(DriverFile);
         if (!Directory.Exists(driverDirectory))
@@ -92,27 +89,19 @@ public class UpdateHandler
             }
             catch (Exception e)
             {
-                Log.Error(e, "Unable to create directory", driverDirectory);
+                Log.Error(e, "Unable to create directory {DriverDirectory}", driverDirectory);
             }
         }
 
-        _progressBar.Message = $"Downloading {_updateData.DownloadUri}";
-        await Downloader.DownloadFile(DriverFile, _updateData.DownloadUri.ToString(), _progress, cancellationToken);
-        _progressBar.Dispose();
+        await Downloader.DownloadFile(DriverFile, _updateData.DownloadUri.ToString(), cancellationToken);
         Log.Information("File saved to {DriverFile}", DriverFile);
     }
 
     private async Task<string> ExtractPackage()
     {
-        DriverFileOutput = Program.TempDirectory + Guid.NewGuid();
+        DriverFileOutput = SystemHelper.TempDirectory + Guid.NewGuid();
         await ExtractHelper.Extract(DriverFile, DriverFileOutput);
 
         return DriverFileOutput;
-    }
-
-    private void ProgressOnProgressChanged(object? sender, float e)
-    {
-        var progressBar = _progressBar.AsProgress<float>();
-        progressBar.Report(e);
     }
 }

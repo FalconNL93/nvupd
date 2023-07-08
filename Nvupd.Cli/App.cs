@@ -1,4 +1,5 @@
-﻿using Nvupd.Core.Helpers;
+﻿using Nvupd.Cli.Models;
+using Nvupd.Core.Helpers;
 using Nvupd.Core.Services;
 using Serilog;
 
@@ -8,15 +9,15 @@ public static class App
 {
     private static AppConfig AppConfig { get; set; } = new();
 
-
-    public static async Task Run(CancellationTokenSource cancellationToken)
+    public static async Task Run(CliOptions cliOptions, CancellationTokenSource cancellationToken)
     {
         Log.Information("{AppName} {Version}", Program.AppAssembly.Name, Program.AppVersion);
-        
+        Log.Verbose("Temp directory: {TempDirectory}", SystemHelper.TempDirectory);
+
         try
         {
             AppConfig = ConfigHelper.ReadConfig();
-            Log.Debug("Configuration parsed");
+            Log.Verbose("Configuration parsed");
         }
         catch (Exception e)
         {
@@ -34,7 +35,7 @@ public static class App
             var nvidiaResponse = await NvidiaUpdateService.GetUpdateData();
             Log.Information("Latest driver: {NvidiaResponseVersion}", nvidiaResponse.Version);
 
-            if (!nvidiaResponse.UpdateAvailable)
+            if (!nvidiaResponse.UpdateAvailable && !cliOptions.ForceUpdate)
             {
                 Log.Information("You are running the latest driver");
                 return;
@@ -42,10 +43,6 @@ public static class App
 
             Log.Information("An update is available");
             Log.Information("Driver package: {DownloadUrl}", nvidiaResponse.DownloadUri.ToString());
-            if (!AppConfig.AutoDownload)
-            {
-                return;
-            }
 
             var updateHandler = new UpdateHandler(nvidiaResponse, gpu);
             await updateHandler.UpdateAvailable(cancellationToken.Token);

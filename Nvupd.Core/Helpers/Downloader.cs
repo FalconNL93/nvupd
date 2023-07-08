@@ -5,7 +5,6 @@ public class Downloader
     public static async Task DownloadFile(
         string path,
         string downloadUrl,
-        Progress<float>? progress,
         CancellationToken cancellationToken = default
     )
     {
