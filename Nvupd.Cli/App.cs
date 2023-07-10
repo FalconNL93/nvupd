@@ -1,29 +1,27 @@
-﻿using Nvupd.Cli.Models;
+﻿using Microsoft.Extensions.Options;
+using Nvupd.Cli.Models;
 using Nvupd.Core.Helpers;
 using Nvupd.Core.Services;
 using Serilog;
 
 namespace Nvupd.Cli;
 
-public static class App
+public class App
 {
-    private static AppConfig AppConfig { get; set; } = new();
+    private readonly AppConfigOptions _appConfigOptions;
+    private readonly CliOptions _cliOptions;
 
-    public static async Task Run(CliOptions cliOptions, CancellationTokenSource cancellationToken)
+
+    public App(IOptions<CliOptions> cliOptions, IOptions<AppConfigOptions> appConfigOptions)
+    {
+        _appConfigOptions = appConfigOptions.Value;
+        _cliOptions = cliOptions.Value;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         Log.Information("{AppName} {Version}", Program.AppAssembly.Name, Program.AppVersion);
         Log.Verbose("Temp directory: {TempDirectory}", SystemHelper.TempDirectory);
-
-        try
-        {
-            AppConfig = ConfigHelper.ReadConfig();
-            Log.Verbose("Configuration parsed");
-        }
-        catch (Exception e)
-        {
-            AppConfig = new AppConfig();
-            Log.Warning("Unable to parse configuration, using default configuration");
-        }
 
         var gpu = GpuHelper.GetGpuInformation();
         Log.Information("Device: {GpuName}", gpu.Name);
@@ -35,7 +33,7 @@ public static class App
             var nvidiaResponse = await NvidiaUpdateService.GetUpdateData();
             Log.Information("Latest driver: {NvidiaResponseVersion}", nvidiaResponse.Version);
 
-            if (!nvidiaResponse.UpdateAvailable && !cliOptions.ForceUpdate)
+            if (!nvidiaResponse.UpdateAvailable && !_cliOptions.ForceUpdate)
             {
                 Log.Information("You are running the latest driver");
                 return;
@@ -45,7 +43,7 @@ public static class App
             Log.Information("Driver package: {DownloadUrl}", nvidiaResponse.DownloadUri.ToString());
 
             var updateHandler = new UpdateHandler(nvidiaResponse, gpu);
-            await updateHandler.UpdateAvailable(cancellationToken.Token);
+            await updateHandler.UpdateAvailable(cancellationToken);
         }
         catch (Exception e)
         {
