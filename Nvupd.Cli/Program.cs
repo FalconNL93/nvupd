@@ -1,7 +1,5 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.NamingConventionBinder;
-using System.CommandLine.Parsing;
+using System.CommandLine.Hosting;
 using System.Globalization;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -22,18 +20,23 @@ internal abstract class Program
     private static readonly string SettingsFile = @$"{AppDirectory}\settings.json";
     public static event EventHandler? CancelEvent;
 
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureHostConfiguration(builder => { builder.AddJsonFile(SettingsFile, optional: true); })
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.Configure<CliOptions>(_ => new CliOptions());
-                services.Configure<AppConfigOptions>(hostContext.Configuration.GetSection("App"));
+    private static CliConfiguration CreateHostBuilder() => BuildCommandLine()
+        .UseHost(_ => Host.CreateDefaultBuilder(), host =>
+        {
+            host
+                .ConfigureHostConfiguration(builder => { builder.AddJsonFile(SettingsFile, optional: true); })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.Configure<AppOptions>(_ => new AppOptions());
+                    services.Configure<AppConfigOptions>(hostContext.Configuration.GetSection("App"));
 
-                services.AddCliCommands();
-                services.AddSingleton<UpdateCommand>();
-                services.AddSingleton<App>();
-            }).UseSerilog();
+                    services.AddCliCommands();
+                    services.AddSingleton<CliRootCommand, RootCommand>();
+                    services.AddSingleton<RootAction>();
+                    services.AddSingleton<App>();
+                }).UseSerilog();
+        });
+
 
     private static async Task Main(string[] args)
     {
@@ -56,12 +59,7 @@ internal abstract class Program
 
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-        var host = CreateHostBuilder(args).Build();
-
-        
-        await host.Services
-            .GetRequiredService<App>()
-            .StartAsync(cancellationToken.Token);
+        await CreateHostBuilder().InvokeAsync(args, cancellationToken.Token);
     }
 
     public static void OnCancelEvent()
@@ -69,16 +67,8 @@ internal abstract class Program
         CancelEvent?.Invoke(null, EventArgs.Empty);
     }
 
-    private static Parser BuildParser(IServiceProvider serviceProvider)
+    private static CliConfiguration BuildCommandLine()
     {
-        var rootCommand = new RootCommand();
-        var commandLineBuilder = new CommandLineBuilder();
-        foreach (var command in serviceProvider.GetServices<Command>())
-        {
-            Console.WriteLine($"Adding {command}");
-            commandLineBuilder.Command.AddCommand(command);
-        }
-
-        return commandLineBuilder.UseDefaults().Build();
+        return new CliConfiguration(new CliRootCommand());
     }
 }

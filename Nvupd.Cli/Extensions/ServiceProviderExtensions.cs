@@ -8,13 +8,13 @@ public static class ServiceProviderExtensions
 {
     public static IServiceCollection AddCliCommands(this IServiceCollection services)
     {
-        var greetCommandType = typeof(UpdateCommand);
-        var commandType = typeof(Command);
+        var rootCommand = typeof(RootCommand);
+        var commandType = typeof(CliCommand);
 
-        var commands = greetCommandType
+        var commands = rootCommand
             .Assembly
             .GetExportedTypes()
-            .Where(x => x.Namespace == greetCommandType.Namespace && commandType.IsAssignableFrom(x));
+            .Where(x => x.Namespace == rootCommand.Namespace && commandType.IsAssignableFrom(x));
 
         foreach (var command in commands)
         {
