@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nvupd.Cli.Models;
 using Serilog;
+using Serilog.Events;
 
 namespace Nvupd.Cli;
 
@@ -14,6 +15,8 @@ internal abstract class Program
     public static readonly string AppVersion = $"{AppAssembly.Version.Major}.{AppAssembly.Version.Minor}.{AppAssembly.Version.Build}";
     private static readonly string? AppDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     private static readonly string SettingsFile = @$"{AppDirectory}\settings.json";
+    private const LogEventLevel DefaultConsoleLevel = LogEventLevel.Information;
+
     public static event EventHandler? CancelEvent;
 
     private static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -23,7 +26,7 @@ internal abstract class Program
             {
                 services.Configure<AppConfigOptions>(hostContext.Configuration.GetSection("App"));
                 services.AddSingleton<App>();
-            }).UseSerilog();
+            });
 
 
     private static async Task Main(string[] args)
@@ -31,7 +34,8 @@ internal abstract class Program
         var cancellationToken = new CancellationTokenSource();
 
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}")
+            .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}", restrictedToMinimumLevel: DefaultConsoleLevel)
+            .WriteTo.File($@"{AppDirectory}\update.log")
             .CreateLogger();
 
         Console.Title = $"{AppAssembly.Name} {AppVersion}";

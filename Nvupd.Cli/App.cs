@@ -8,13 +8,10 @@ namespace Nvupd.Cli;
 
 public class App
 {
-    private readonly AppConfigOptions _appConfigOptions;
     private readonly AppOptions _cliOptions;
 
-
-    public App(IOptions<AppOptions> cliOptions, IOptions<AppConfigOptions> appConfigOptions)
+    public App(IOptions<AppOptions> cliOptions)
     {
-        _appConfigOptions = appConfigOptions.Value;
         _cliOptions = cliOptions.Value;
     }
 
