@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using Nvupd.Cli.Models;
 
@@ -26,8 +25,6 @@ public class RootAction : AsynchronousCliAction
 {
     public override async Task<int> InvokeAsync(ParseResult parseResult, CancellationToken cancellationToken = new CancellationToken())
     {
-        Console.WriteLine("blablabla");
-
         return 0;
     }
 }

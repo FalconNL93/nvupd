@@ -1,12 +1,8 @@
-﻿using System.CommandLine;
-using System.CommandLine.Hosting;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Nvupd.Cli.Commands;
-using Nvupd.Cli.Extensions;
 using Nvupd.Cli.Models;
 using Serilog;
 
@@ -20,22 +16,14 @@ internal abstract class Program
     private static readonly string SettingsFile = @$"{AppDirectory}\settings.json";
     public static event EventHandler? CancelEvent;
 
-    private static CliConfiguration CreateHostBuilder() => BuildCommandLine()
-        .UseHost(_ => Host.CreateDefaultBuilder(), host =>
-        {
-            host
-                .ConfigureHostConfiguration(builder => { builder.AddJsonFile(SettingsFile, optional: true); })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.Configure<AppOptions>(_ => new AppOptions());
-                    services.Configure<AppConfigOptions>(hostContext.Configuration.GetSection("App"));
-
-                    services.AddCliCommands();
-                    services.AddSingleton<CliRootCommand, RootCommand>();
-                    services.AddSingleton<RootAction>();
-                    services.AddSingleton<App>();
-                }).UseSerilog();
-        });
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureHostConfiguration(builder => { builder.AddJsonFile(SettingsFile, optional: true); })
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.Configure<AppConfigOptions>(hostContext.Configuration.GetSection("App"));
+                services.AddSingleton<App>();
+            }).UseSerilog();
 
 
     private static async Task Main(string[] args)
@@ -59,16 +47,14 @@ internal abstract class Program
 
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-        await CreateHostBuilder().InvokeAsync(args, cancellationToken.Token);
+        var host = CreateHostBuilder(args).Build();
+        var startup = host.Services.GetRequiredService<App>();
+
+        await startup.StartAsync(cancellationToken.Token);
     }
 
     public static void OnCancelEvent()
     {
         CancelEvent?.Invoke(null, EventArgs.Empty);
-    }
-
-    private static CliConfiguration BuildCommandLine()
-    {
-        return new CliConfiguration(new CliRootCommand());
     }
 }
