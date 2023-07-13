@@ -34,4 +34,9 @@ public static class SystemHelper
             Console.WriteLine($"Deleting file: {file}");
         }
     }
+
+    public static void Messagebox()
+    {
+        Apis.WinApi.Messagebox(IntPtr.Zero, "Test", "Test", 1);
+    }
 }

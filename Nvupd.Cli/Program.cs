@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Nvupd.Cli.Models;
+using Nvupd.Core.Helpers;
 using Serilog;
 using Serilog.Events;
 
@@ -31,11 +32,31 @@ internal abstract class Program
 
     private static async Task Main(string[] args)
     {
+        try
+        {
+            await Startup(args);
+        }
+        catch (Exception e)
+        {
+            WinHelper.MessageBox($"Unable to start application due to an error: {e.Message.PrependNewLines(2)}", "Error", new[]
+            {
+                MessageBoxTypes.Ok,
+                MessageBoxTypes.Error
+            });
+        }
+
+        Environment.Exit(1);
+    }
+
+    private static async Task Startup(string[] args)
+    {
         var cancellationToken = new CancellationTokenSource();
 
+        File.WriteAllText(@"X:\awdawd\dawda.zip", "awdawdawd");
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}", restrictedToMinimumLevel: DefaultConsoleLevel)
+            .MinimumLevel.Verbose()
             .WriteTo.File($@"{AppDirectory}\update.log")
+            .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}", restrictedToMinimumLevel: DefaultConsoleLevel)
             .CreateLogger();
 
         Console.Title = $"{AppAssembly.Name} {AppVersion}";

@@ -1,6 +1,17 @@
-﻿using System.Runtime.InteropServices;
+﻿namespace Nvupd.Core.Helpers;
 
-namespace Nvupd.Core.Helpers;
+public static class WinHelper
+{
+    public static MessageBoxResults MessageBox(string text, string caption, IEnumerable<uint> types)
+    {
+        return (MessageBoxResults)Apis.WinApi.Messagebox(IntPtr.Zero, text, caption, Convert.ToUInt32(types.Sum(x => x)));
+    }
+
+    public static MessageBoxResults MessageBox(string text, string caption = "", uint type = MessageBoxTypes.Ok)
+    {
+        return MessageBox(text, caption, new[] { type });
+    }
+}
 
 public class MessageBoxTypes
 {
@@ -23,10 +34,4 @@ public enum MessageBoxResults
     Abort = 3,
     Yes = 6,
     No = 7
-}
-
-public class User32
-{
-    [DllImport("user32.dll", SetLastError = true)]
-    public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 }
